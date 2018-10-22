@@ -62,35 +62,20 @@ class BurgerBuilder extends Component {
     }
 
     purchaseContinueHandler = () => {
-        this.props.history.push('/checkout');
+        // TODO: pass the ingredents
+        let searchParams = Object.keys(this.state.ingredients)
+            .reduce((query, key) => {
+                let value = this.state.ingredients[key];
 
-        // const order = {
-        //     ingredients: this.state.ingredients,
-        //     price: this.state.totalPrice,
-        //     customer: {
-        //         name: 'Bill Kurtson',
-        //         address: {
-        //             street: 'street 1',
-        //             zipCode: '12435',
-        //             country: 'Sweden'
-        //         },
-        //         email: 'test@test.com'
-        //     },
-        //     devileryMethod: 'fastest'
-        // };
+                return query + `${encodeURIComponent(key)}=${encodeURIComponent(value)}&`;
+            }, '?');
 
-        // this.setState({loading: true});
+        searchParams += `price=${this.state.totalPrice}`;
 
-        // axios.post('orders.json', order)
-        //     .then(response => {
-        //         console.log(response);
-        //     })
-        //     .catch(error => {
-        //         console.error(error);
-        //     })
-        //     .then(() => {
-        //         this.setState({loading: false, purchasing: false});
-        //     });
+        this.props.history.push({
+            pathname: '/checkout',
+            search: searchParams
+        });
     }
 
     addIngredientHandler = (type) => {
@@ -118,6 +103,7 @@ class BurgerBuilder extends Component {
             const priceDeduction = INGREDIENT_PRICES[type];
             const oldPrice = this.state.totalPrice;
             const newPrice = oldPrice - priceDeduction;
+
             updatedIngrendients[type] = updatedCount;
 
             this.setState({totalPrice: newPrice, ingredients: updatedIngrendients});
