@@ -1,4 +1,4 @@
-import React, { Component } from 'react'
+import React, { Component } from 'react';
 import Button from '../../../components/UI/Button/Button';
 import Spinner from '../../../components/UI/Spinner/Spinner';
 import axios from '../../../axios-orders'
@@ -21,7 +21,7 @@ class ContactData extends Component {
 
         const order = {
             ingredients: this.props.ingredients,
-            price: this.props.price,
+            price: +this.props.price,
             customer: {
                 name: 'Bill Kurtson',
                 address: {
