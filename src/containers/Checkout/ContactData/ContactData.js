@@ -1,42 +1,116 @@
 import React, { Component } from 'react';
 import Button from '../../../components/UI/Button/Button';
 import Spinner from '../../../components/UI/Spinner/Spinner';
-import axios from '../../../axios-orders'
-
+import axios from '../../../axios-orders';
 import classes from './ContactData.css';
+import Input from '../../../components/UI/Input/Input';
 
 class ContactData extends Component {
     state = {
+        orderForm: {
+            name: {
+                elementType: 'input',
+                elementConfig: {
+                    type: 'text',
+                    placeholder: 'Bill',
+                },
+                value: '',
+            },
+            street: {
+                elementType: 'input',
+                elementConfig: {
+                    type: 'text',
+                    placeholder: 'Street',
+                },
+                value: '',
+            },
+            zipCode: {
+                elementType: 'input',
+                elementConfig: {
+                    type: 'text',
+                    placeholder: 'Zipcode',
+                },
+                value: '',
+            },
+            country: {
+                elementType: 'input',
+                elementConfig: {
+                    type: 'text',
+                    placeholder: 'Sweden',
+                },
+                value: '',
+            },
+            email: {
+                elementType: 'input',
+                elementConfig: {
+                    type: 'email',
+                    placeholder: 'example@mail.com',
+                },
+                value: '',
+            },
+            devileryMethod: {
+                elementType: 'select',
+                elementConfig: {
+                    options: [
+                        {
+                            value: 'fastest',
+                            displayValue: 'Fastest',
+                        },
+                        {
+                            value: 'cheapest',
+                            displayValue: 'Cheapest',
+                        },
+                    ],
+                },
+                value: 'fastest',
+            },
+        },
         name: '',
         email: '',
         address: {
             street: '',
-            postalCode: ''
+            postalCode: '',
         },
-        loading: false
+        loading: false,
     };
 
-    orderHandler = (e) => {
-        e.preventDefault();
-
-        const order = {
-            ingredients: this.props.ingredients,
-            price: +this.props.price,
-            customer: {
-                name: 'Bill Kurtson',
-                address: {
-                    street: 'street 1',
-                    zipCode: '12435',
-                    country: 'Sweden'
-                },
-                email: 'test@test.com'
-            },
-            devileryMethod: 'fastest'
+    inputChangedHandler = (event, inputIdentifier) => {
+        const updatedOrderForm = {
+            ...this.state.orderForm,
+        };
+        const updatedFormElement = {
+            ...updatedOrderForm[inputIdentifier],
         };
 
-        this.setState({loading: true});
+        updatedFormElement.value = event.target.value;
+        updatedOrderForm[inputIdentifier] = updatedFormElement;
 
-        axios.post('orders.json', order)
+        this.setState({ orderForm: updatedOrderForm });
+
+        console.log(event.target.value);
+    };
+
+    orderHandler = event => {
+        let order;
+        const formData = {};
+
+        event.preventDefault();
+        this.setState({ loading: true });
+
+        for (let formElementIdentifier of Object.keys(this.state.orderForm)) {
+            formData[formElementIdentifier] = this.state.orderForm[
+                formElementIdentifier
+            ].value;
+        }
+
+        order = {
+            ingredients: this.props.ingredients,
+            price: +this.props.price,
+            orderData: formData,
+        };
+
+        axios
+            .post('orders.json', order)
             .then(response => {
                 console.log(response);
                 this.setState({ loading: false });
@@ -46,16 +120,32 @@ class ContactData extends Component {
                 this.setState({ loading: false });
                 console.error(error);
             });
-        }
+    };
 
     render() {
+        const formElements = [];
+
+        for (let key of Object.keys(this.state.orderForm)) {
+            formElements.push({
+                id: key,
+                config: this.state.orderForm[key],
+            });
+        }
+
         let form = (
-            <form>
-                <input className={classes.input} type="text" name="name" placeholder="Your Name" />
-                <input className={classes.input} type="email" name="email" placeholder="Your Email" />
-                <input className={classes.input} type="text" name="street" placeholder="Street" />
-                <input className={classes.input} type="text" name="postal" placeholder="Postal Code" />
-                <Button btnType="Success" clicked={this.orderHandler}>ORDER</Button>
+            <form onSubmit={this.orderHandler}>
+                {formElements.map((formElement, index) => (
+                    <Input
+                        key={formElement.id}
+                        elementType={formElement.config.elementType}
+                        elementConfig={formElement.config.elementConfig}
+                        value={formElement.config.value}
+                        changed={event =>
+                            this.inputChangedHandler(event, formElement.id)
+                        }
+                    />
+                ))}
+                <Button btnType="Success">ORDER</Button>
             </form>
         );
 
