@@ -12,36 +12,41 @@ class ContactData extends Component {
                 elementType: 'input',
                 elementConfig: {
                     type: 'text',
+                    placeholder: 'Bill',
                 },
-                value: 'Bill',
+                value: '',
             },
             street: {
                 elementType: 'input',
                 elementConfig: {
                     type: 'text',
+                    placeholder: 'Street',
                 },
-                value: 'Street',
+                value: '',
             },
             zipCode: {
                 elementType: 'input',
                 elementConfig: {
                     type: 'text',
+                    placeholder: 'Zipcode',
                 },
-                value: 'Zipcode',
+                value: '',
             },
             country: {
                 elementType: 'input',
                 elementConfig: {
                     type: 'text',
+                    placeholder: 'Sweden',
                 },
-                value: 'Sweden',
+                value: '',
             },
             email: {
                 elementType: 'input',
                 elementConfig: {
                     type: 'email',
+                    placeholder: 'example@mail.com',
                 },
-                value: 'example@mail.com',
+                value: '',
             },
             devileryMethod: {
                 elementType: 'select',
@@ -85,15 +90,24 @@ class ContactData extends Component {
         console.log(event.target.value);
     };
 
-    orderHandler = e => {
-        e.preventDefault();
+    orderHandler = event => {
+        let order;
+        const formData = {};
 
-        const order = {
+        event.preventDefault();
+        this.setState({ loading: true });
+
+        for (let formElementIdentifier of Object.keys(this.state.orderForm)) {
+            formData[formElementIdentifier] = this.state.orderForm[
+                formElementIdentifier
+            ].value;
+        }
+
+        order = {
             ingredients: this.props.ingredients,
             price: +this.props.price,
+            orderData: formData,
         };
-
-        this.setState({ loading: true });
 
         axios
             .post('orders.json', order)
@@ -119,7 +133,7 @@ class ContactData extends Component {
         }
 
         let form = (
-            <form>
+            <form onSubmit={this.orderHandler}>
                 {formElements.map((formElement, index) => (
                     <Input
                         key={formElement.id}
@@ -131,9 +145,7 @@ class ContactData extends Component {
                         }
                     />
                 ))}
-                <Button btnType="Success" clicked={this.orderHandler}>
-                    ORDER
-                </Button>
+                <Button btnType="Success">ORDER</Button>
             </form>
         );
 
