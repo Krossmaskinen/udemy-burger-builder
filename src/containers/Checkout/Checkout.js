@@ -17,18 +17,21 @@ class Checkout extends Component {
 
     getIngredientsFromQueryParams(query) {
         let queryParams = {};
+        let parsedQuery = query.split('?')[1];
 
-        query.split('?')[1]
-            .split('&')
-            .forEach(param => {
-                let pair = param.split('=');
+        if (parsedQuery) {
+            parsedQuery
+                .split('&')
+                .forEach(param => {
+                    let pair = param.split('=');
 
-                if (pair[0] !== 'price') {
-                    queryParams[pair[0]] = +pair[1];
-                } else {
-                    this.setState({totalPrice: pair[1]});
-                }
-            });
+                    if (pair[0] !== 'price') {
+                        queryParams[pair[0]] = +pair[1];
+                    } else {
+                        this.setState({ totalPrice: pair[1] });
+                    }
+                });
+        }
 
         return queryParams;
     }
@@ -39,6 +42,7 @@ class Checkout extends Component {
 
     loadIngredients = () => {
         let ingredients = this.getIngredientsFromQueryParams(this.props.location.search);
+
         console.log(ingredients);
         console.log(this.props);
 
