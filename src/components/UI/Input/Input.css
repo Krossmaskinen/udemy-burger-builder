@@ -24,3 +24,8 @@
     outline: none;
     background-color: #ccc;
 }
+
+.HasError {
+    border: 1px solid red;
+    background-color: salmon;
+}
